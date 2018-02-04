@@ -13,24 +13,44 @@ public class App {
         CONFIG_KEY_NAME.put("-s", "server");
         CONFIG_KEY_NAME.put("-p", "password");
         CONFIG_KEY_NAME.put("-u", "username");
-        CONFIG_KEY_NAME.put("-np", "newPassword");
+        CONFIG_KEY_NAME.put("-du", "dbUsername");
+        CONFIG_KEY_NAME.put("-dnp", "dbNewPassword");
+        CONFIG_KEY_NAME.put("-dn", "datasourceName");
     }
 
     public static void main(String[] args) {
-        System.out.println("version: 2018/01/31");
+        System.out.println("version: 2018/02/04");
         int res = 0;
         Map<String, String> config = new App().getConfig(args);
 
         String server = config.get("server");
         String username = config.get("username");
         String password = config.get("password");
-        String newPassword = config.get("newPassword");
+        String dbUsername = config.get("dbUsername");
+        String dbNewPassword = config.get("dbNewPassword");
+        String datasourceName = config.get("datasourceName");
+
 
         RestApiUtils utils = RestApiUtils.getInstance(server);
         TableauCredentialsType credential = null;
         try {
             credential = utils.invokeSignIn(username, password, server);
-            utils.invokeUpdatePassword(credential, newPassword);
+            Map<String, Object> datasources = utils.invokeQueryDatasources(credential, credential.getSite().getId());
+            for (String datasourceKey: datasources.keySet()) {
+                Map<String, Object> datasource = (Map<String, Object>) datasources.get(datasourceKey);
+                Map<String, Object> connections = utils.invokeQueryDatasourceConnections(credential, credential.getSite().getId(), (String) datasource.get("id"));
+                for (String connectionKey: connections.keySet()) {
+                    Map<String, Object> connection = (Map<String, Object>) connections.get(connectionKey);
+                    utils.invokeUpdateDatasourceConnection(
+                            credential,
+                            credential.getSite().getId(),
+                            (String) datasource.get("id"),
+                            (String) connection.get("id"),
+                            dbUsername,
+                            dbNewPassword
+                        );
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
             res = 1;

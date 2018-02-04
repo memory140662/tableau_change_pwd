@@ -2,6 +2,8 @@ package rest.util;
 
 
 import com.google.common.io.Files;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -26,6 +28,8 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.*;
+import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -48,6 +52,9 @@ public class RestApiUtils {
         SIGN_IN(getApiUriBuilder().path("auth/signin")),
         SIGN_OUT(getApiUriBuilder().path("auth/signout")),
         USER_UPDATE(getApiUriBuilder().path("sites/{siteId}/users/{userId}")),
+        QUERY_DATASOURCES(getApiUriBuilder().path("sites/{siteId}/datasources")),
+        QUERY_DATASOURCE_CONNECTIONS(getApiUriBuilder().path("sites/{siteId}/datasources/{datasourceId}/connections")),
+        UPDATE_DATASOURCE_CONNECTION(getApiUriBuilder().path("sites/{siteId}/datasources/{datasourceId}/connections/{connectionId}")),
         ;
 
         private final UriBuilder m_builder;
@@ -320,6 +327,96 @@ public class RestApiUtils {
             m_logger.info("Query projects is successful!");
 
             return response.getProjects();
+        }
+
+        // No projects were found
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> invokeQueryDatasources(TableauCredentialsType credential, String siteId) {
+
+        m_logger.info(String.format("Querying datasourcrs on site '%s'.", siteId));
+
+        String url = Operation.QUERY_DATASOURCES.getUrl(siteId);
+
+        Client client = Client.create();
+        WebResource webResource = client.resource(url);
+
+        // Sets the header and makes a GET request
+        ClientResponse clientResponse = webResource.header(TABLEAU_AUTH_HEADER, credential.getToken())
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get(ClientResponse.class);
+
+        // Parses the response from the server into an XML string
+        String responseJson = clientResponse.getEntity(String.class);
+
+        if (clientResponse.getStatus() == 200) {
+            m_logger.info("Query datasrouces is successful!");
+            Type type = new TypeToken<Map<String, Object>>(){}.getType();
+            return (Map<String, Object>) ((Map<String, Object>) new Gson().fromJson(responseJson, type)).get("datasources");
+        }
+
+        // No projects were found
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> invokeQueryDatasourceConnections(TableauCredentialsType credential, String siteId, String datasourceId) {
+
+        m_logger.info(String.format("Querying datasourcrs on site '%s'.", siteId));
+
+        String url = Operation.QUERY_DATASOURCE_CONNECTIONS.getUrl(siteId, datasourceId);
+
+        Client client = Client.create();
+        WebResource webResource = client.resource(url);
+
+        // Sets the header and makes a GET request
+        ClientResponse clientResponse = webResource.header(TABLEAU_AUTH_HEADER, credential.getToken())
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get(ClientResponse.class);
+
+        String responseJson = clientResponse.getEntity(String.class);
+
+        // Verifies that the response has a projects element
+        if (clientResponse.getStatus() == 200) {
+            m_logger.info("Query datasrouces is successful!");
+            Type type = new TypeToken<Map<String, Object>>(){}.getType();
+            return (Map<String, Object>) ((Map<String, Object>) new Gson().fromJson(responseJson, type)).get("connections");
+        }
+
+        // No projects were found
+        return null;
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> invokeUpdateDatasourceConnection(TableauCredentialsType credential, String siteId, String datasourceId, String connectionId, String username, String password) {
+
+        m_logger.info(String.format("Querying datasourcrs on site '%s'.", siteId));
+
+        String url = Operation.UPDATE_DATASOURCE_CONNECTION.getUrl(siteId, datasourceId, connectionId);
+
+        Client client = Client.create();
+        WebResource webResource = client.resource(url);
+        Map<String, Object> data = new HashMap<>();
+        Map<String, Object> connection = new HashMap<>();
+        connection.put("username", username);
+        connection.put("password", password);
+        data.put("connection", connection);
+
+        // Sets the header and makes a GET request
+        ClientResponse clientResponse = webResource.header(TABLEAU_AUTH_HEADER, credential.getToken())
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .put(ClientResponse.class, data);
+
+        String responseJson = clientResponse.getEntity(String.class);
+
+        // Verifies that the response has a projects element
+        if (clientResponse.getStatus() == 200) {
+            m_logger.info("Query datasrouces is successful!");
+            Type type = new TypeToken<Map<String, Object>>(){}.getType();
+            return (Map<String, Object>) ((Map<String, Object>) new Gson().fromJson(responseJson, type)).get("connection");
         }
 
         // No projects were found
