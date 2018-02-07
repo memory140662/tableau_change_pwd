@@ -336,7 +336,8 @@ public class RestApiUtils {
     @SuppressWarnings("unchecked")
     public Map<String, Object> invokeQueryDatasources(TableauCredentialsType credential, String siteId) {
 
-        m_logger.info(String.format("Querying datasourcrs on site '%s'.", siteId));
+        m_logger.info(String.format("Querying datasources on site '%s'.", siteId));
+        System.out.println(String.format("Querying datasources on site '%s'.", siteId));
 
         String url = Operation.QUERY_DATASOURCES.getUrl(siteId);
 
@@ -352,7 +353,8 @@ public class RestApiUtils {
         String responseJson = clientResponse.getEntity(String.class);
 
         if (clientResponse.getStatus() == 200) {
-            m_logger.info("Query datasrouces is successful!");
+            m_logger.info("Query datasources are successful!");
+            System.out.println("Query datasources are successful!");
             Type type = new TypeToken<Map<String, Object>>(){}.getType();
             return (Map<String, Object>) ((Map<String, Object>) new Gson().fromJson(responseJson, type)).get("datasources");
         }
@@ -364,7 +366,8 @@ public class RestApiUtils {
     @SuppressWarnings("unchecked")
     public Map<String, Object> invokeQueryDatasourceConnections(TableauCredentialsType credential, String siteId, String datasourceId) {
 
-        m_logger.info(String.format("Querying datasourcrs on site '%s'.", siteId));
+        m_logger.info(String.format("Querying datasource connections on site '%s'.", siteId));
+        System.out.println(String.format("Querying datasource connections on site '%s'.", siteId));
 
         String url = Operation.QUERY_DATASOURCE_CONNECTIONS.getUrl(siteId, datasourceId);
 
@@ -380,7 +383,8 @@ public class RestApiUtils {
 
         // Verifies that the response has a projects element
         if (clientResponse.getStatus() == 200) {
-            m_logger.info("Query datasrouces is successful!");
+            m_logger.info("Query datasource connections are successful!");
+            System.out.println("Query datasource connections are successful!");
             Type type = new TypeToken<Map<String, Object>>(){}.getType();
             return (Map<String, Object>) ((Map<String, Object>) new Gson().fromJson(responseJson, type)).get("connections");
         }
@@ -391,9 +395,10 @@ public class RestApiUtils {
 
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> invokeUpdateDatasourceConnection(TableauCredentialsType credential, String siteId, String datasourceId, String connectionId, String username, String password) {
+    public Map<String, Object> invokeUpdateDatasourceConnection(TableauCredentialsType credential, String siteId, String datasourceId, String connectionId, String password) {
 
-        m_logger.info(String.format("Querying datasourcrs on site '%s'.", siteId));
+        m_logger.info(String.format("Updating datasource connection on site '%s'.", siteId));
+        System.out.println(String.format("Updating datasource connection on site '%s'.", siteId));
 
         String url = Operation.UPDATE_DATASOURCE_CONNECTION.getUrl(siteId, datasourceId, connectionId);
 
@@ -401,20 +406,21 @@ public class RestApiUtils {
         WebResource webResource = client.resource(url);
         Map<String, Object> data = new HashMap<>();
         Map<String, Object> connection = new HashMap<>();
-        connection.put("username", username);
         connection.put("password", password);
         data.put("connection", connection);
 
         // Sets the header and makes a GET request
         ClientResponse clientResponse = webResource.header(TABLEAU_AUTH_HEADER, credential.getToken())
                 .accept(MediaType.APPLICATION_JSON_TYPE)
-                .put(ClientResponse.class, data);
+                .type(MediaType.APPLICATION_JSON_TYPE)
+                .put(ClientResponse.class, new Gson().toJson(data));
 
         String responseJson = clientResponse.getEntity(String.class);
 
         // Verifies that the response has a projects element
         if (clientResponse.getStatus() == 200) {
-            m_logger.info("Query datasrouces is successful!");
+            m_logger.info("Update datasource connection is successful!");
+            System.out.println("Update datasource connection is successful!");
             Type type = new TypeToken<Map<String, Object>>(){}.getType();
             return (Map<String, Object>) ((Map<String, Object>) new Gson().fromJson(responseJson, type)).get("connection");
         }

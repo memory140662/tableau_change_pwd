@@ -4,6 +4,7 @@ import rest.bindings.TableauCredentialsType;
 import rest.util.RestApiUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class App {
@@ -13,42 +14,45 @@ public class App {
         CONFIG_KEY_NAME.put("-s", "server");
         CONFIG_KEY_NAME.put("-p", "password");
         CONFIG_KEY_NAME.put("-u", "username");
-        CONFIG_KEY_NAME.put("-du", "dbUsername");
         CONFIG_KEY_NAME.put("-dnp", "dbNewPassword");
-        CONFIG_KEY_NAME.put("-dn", "datasourceName");
+        CONFIG_KEY_NAME.put("-t", "type");
     }
 
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        System.out.println("version: 2018/02/04");
+        System.out.println("version: 2018/02/07");
         int res = 0;
         Map<String, String> config = new App().getConfig(args);
 
         String server = config.get("server");
         String username = config.get("username");
         String password = config.get("password");
-        String dbUsername = config.get("dbUsername");
         String dbNewPassword = config.get("dbNewPassword");
-        String datasourceName = config.get("datasourceName");
+        String type = config.get("type");
 
-
-        RestApiUtils utils = RestApiUtils.getInstance(server);
+        RestApiUtils utils = null;
         TableauCredentialsType credential = null;
         try {
+            utils = RestApiUtils.getInstance(server);
             credential = utils.invokeSignIn(username, password, server);
             Map<String, Object> datasources = utils.invokeQueryDatasources(credential, credential.getSite().getId());
             for (String datasourceKey: datasources.keySet()) {
-                Map<String, Object> datasource = (Map<String, Object>) datasources.get(datasourceKey);
-                Map<String, Object> connections = utils.invokeQueryDatasourceConnections(credential, credential.getSite().getId(), (String) datasource.get("id"));
-                for (String connectionKey: connections.keySet()) {
-                    Map<String, Object> connection = (Map<String, Object>) connections.get(connectionKey);
-                    utils.invokeUpdateDatasourceConnection(
-                            credential,
-                            credential.getSite().getId(),
-                            (String) datasource.get("id"),
-                            (String) connection.get("id"),
-                            dbUsername,
-                            dbNewPassword
-                        );
+                List<Map<String, Object>> datasource = (List<Map<String, Object>>) datasources.get(datasourceKey);
+                for (Map<String, Object> data: datasource) {
+                    if (isTypeNotEqual(type, data)) continue;
+                    Map<String, Object> connections = utils.invokeQueryDatasourceConnections(credential, credential.getSite().getId(), (String) data.get("id"));
+                    for (String connectionKey: connections.keySet()) {
+                        List<Map<String, Object>> connection = (List<Map<String, Object>>) connections.get(connectionKey);
+                        for (Map<String, Object> conn: connection) {
+                            utils.invokeUpdateDatasourceConnection(
+                                    credential,
+                                    credential.getSite().getId(),
+                                    (String) data.get("id"),
+                                    (String) conn.get("id"),
+                                    dbNewPassword
+                            );
+                        }
+                    }
                 }
             }
         } catch (Exception e) {
@@ -60,6 +64,10 @@ public class App {
             }
         }
         System.exit(res);
+    }
+
+    private static boolean isTypeNotEqual(String type, Map<String, Object> data) {
+        return type != null && !type.trim().isEmpty() && !type.equalsIgnoreCase((String) data.get("type"));
     }
 
     private Map<String, String> getConfig(String ...args) {
