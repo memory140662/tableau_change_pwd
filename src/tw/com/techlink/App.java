@@ -14,20 +14,20 @@ public class App {
         CONFIG_KEY_NAME.put("-s", "server");
         CONFIG_KEY_NAME.put("-p", "password");
         CONFIG_KEY_NAME.put("-u", "username");
-        CONFIG_KEY_NAME.put("-dnp", "dbNewPassword");
+        CONFIG_KEY_NAME.put("-ndp", "newDbPassword");
         CONFIG_KEY_NAME.put("-t", "type");
     }
 
     @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        System.out.println("version: 2018/02/07");
+        System.out.println("version: 2018/02/08");
         int res = 0;
         Map<String, String> config = new App().getConfig(args);
 
         String server = config.get("server");
         String username = config.get("username");
         String password = config.get("password");
-        String dbNewPassword = config.get("dbNewPassword");
+        String dbNewPassword = config.get("newDbPassword");
         String type = config.get("type");
 
         RestApiUtils utils = null;
