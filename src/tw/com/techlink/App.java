@@ -20,7 +20,7 @@ public class App {
 
     @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        System.out.println("version: 2018/02/08");
+        System.out.println("version: 2018/02/09");
         int res = 0;
         Map<String, String> config = new App().getConfig(args);
 
@@ -33,24 +33,33 @@ public class App {
         RestApiUtils utils = null;
         TableauCredentialsType credential = null;
         try {
+            if (username == null || password == null || server == null) throw new Exception("Username, Password or Server is null.");
             utils = RestApiUtils.getInstance(server);
-            credential = utils.invokeSignIn(username, password, server);
+            credential = utils.invokeSignIn(username, password, (server.contains("localhost")) ? "" : server);
             Map<String, Object> datasources = utils.invokeQueryDatasources(credential, credential.getSite().getId());
+            Object tmp;
             for (String datasourceKey: datasources.keySet()) {
                 List<Map<String, Object>> datasource = (List<Map<String, Object>>) datasources.get(datasourceKey);
                 for (Map<String, Object> data: datasource) {
                     if (isTypeNotEqual(type, data)) continue;
+                    System.out.println(String.format("Datasource Name: %s, Type: %s", data.get("name"), data.get("type")));
                     Map<String, Object> connections = utils.invokeQueryDatasourceConnections(credential, credential.getSite().getId(), (String) data.get("id"));
                     for (String connectionKey: connections.keySet()) {
                         List<Map<String, Object>> connection = (List<Map<String, Object>>) connections.get(connectionKey);
                         for (Map<String, Object> conn: connection) {
-                            utils.invokeUpdateDatasourceConnection(
-                                    credential,
-                                    credential.getSite().getId(),
-                                    (String) data.get("id"),
-                                    (String) conn.get("id"),
-                                    dbNewPassword
-                            );
+                            System.out.println(String.format("\tConnection User Name: %s", conn.get("userName")));
+                            if (dbNewPassword != null && !dbNewPassword.trim().isEmpty()) {
+                                tmp = utils.invokeUpdateDatasourceConnection(
+                                        credential,
+                                        credential.getSite().getId(),
+                                        (String) data.get("id"),
+                                        (String) conn.get("id"),
+                                        dbNewPassword
+                                );
+                                if (tmp == null) {
+                                    System.out.println("Update datasource connection failed.");
+                                }
+                            }
                         }
                     }
                 }
