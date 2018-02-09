@@ -85,7 +85,10 @@ public class App {
         for (int index = 0; index < args.length; index++) {
             arg = args[index];
             if (arg.startsWith("-")) {
-                if ((index + 1) > args.length && !args[index + 1].startsWith("-")) {
+                if ((index + 1) < args.length && !args[index + 1].startsWith("-")) {
+                    if (CONFIG_KEY_NAME.get(arg) == null) {
+                        throw new RuntimeException("錯誤指令: ".concat(arg));
+                    }
                     config.put(CONFIG_KEY_NAME.get(arg), (++index < args.length) ? args[index] : null);
                 }
             }
