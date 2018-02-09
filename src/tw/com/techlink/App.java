@@ -22,17 +22,18 @@ public class App {
     public static void main(String[] args) {
         System.out.println("version: 2018/02/09");
         int res = 0;
-        Map<String, String> config = new App().getConfig(args);
-
-        String server = config.get("server");
-        String username = config.get("username");
-        String password = config.get("password");
-        String dbNewPassword = config.get("newDbPassword");
-        String type = config.get("type");
 
         RestApiUtils utils = null;
         TableauCredentialsType credential = null;
         try {
+            Map<String, String> config = new App().getConfig(args);
+
+            String server = config.get("server");
+            String username = config.get("username");
+            String password = config.get("password");
+            String dbNewPassword = config.get("newDbPassword");
+            String type = config.get("type");
+
             if (username == null || password == null || server == null) throw new Exception("Username, Password or Server is null.");
             utils = RestApiUtils.getInstance(server);
             credential = utils.invokeSignIn(username, password, (server.contains("localhost")) ? "" : server);
@@ -87,7 +88,7 @@ public class App {
             if (arg.startsWith("-")) {
                 if ((index + 1) < args.length && !args[index + 1].startsWith("-")) {
                     if (CONFIG_KEY_NAME.get(arg) == null) {
-                        throw new RuntimeException("錯誤指令: ".concat(arg));
+                        throw new RuntimeException("不知名的指令：".concat(arg));
                     }
                     config.put(CONFIG_KEY_NAME.get(arg), (++index < args.length) ? args[index] : null);
                 }

@@ -138,7 +138,7 @@ public class RestApiUtils {
 
     private final String TABLEAU_PAYLOAD_NAME = "request_payload";
 
-    private Logger m_logger = Logger.getLogger(RestApiUtils.class);
+//    private Logger // m_logger = Logger.getLogger(RestApiUtils.class);
 
     private ObjectFactory m_objectFactory = new ObjectFactory();
 
@@ -200,7 +200,7 @@ public class RestApiUtils {
     public PermissionsType invokeAddPermissionsToWorkbook(TableauCredentialsType credential, String siteId,
                                                           String workbookId, List<GranteeCapabilitiesType> granteeCapabilities) {
 
-        m_logger.info(String.format("Adding permissions to workbook '%s'.", workbookId));
+//        // m_logger.info(String.format("Adding permissions to workbook '%s'.", workbookId));
 
         String url = Operation.ADD_WORKBOOK_PERMISSIONS.getUrl(siteId, workbookId);
 
@@ -212,7 +212,7 @@ public class RestApiUtils {
 
         // Verifies that the response has a permissions element
         if (response.getPermissions() != null) {
-            m_logger.info("Add workbook permissions is successful!");
+//            // m_logger.info("Add workbook permissions is successful!");
 
             return response.getPermissions();
         }
@@ -236,7 +236,7 @@ public class RestApiUtils {
      */
     public GroupType invokeCreateGroup(TableauCredentialsType credential, String siteId, String groupName) {
 
-        m_logger.info(String.format("Creating group '%s' on site '%s'.", groupName, siteId));
+//        // m_logger.info(String.format("Creating group '%s' on site '%s'.", groupName, siteId));
 
         String url = Operation.CREATE_GROUP.getUrl(siteId);
 
@@ -249,7 +249,7 @@ public class RestApiUtils {
 
         // Verifies that the response has a group element
         if (response.getGroup() != null) {
-            m_logger.info("Create group is successful!");
+//            // m_logger.info("Create group is successful!");
 
             return response.getGroup();
         }
@@ -261,7 +261,7 @@ public class RestApiUtils {
 
     // zhu
     public void invokeUpdatePassword(TableauCredentialsType credential, String newPassword) {
-        m_logger.info("Update Password.");
+//        // m_logger.info("Update Password.");
         String url = Operation.USER_UPDATE.getUrl(credential.getSite().getId(), credential.getUser().getId());
         String jsonBody = String.format("{\"user\": {\"password\":\"%s\"}}", newPassword);
         Client client = Client.create();
@@ -269,7 +269,7 @@ public class RestApiUtils {
         ClientResponse clientResponse = webResource.header(TABLEAU_AUTH_HEADER, credential.getToken())
                 .type(MediaType.APPLICATION_JSON_TYPE).post(ClientResponse.class, jsonBody);
         String responseXML = clientResponse.getEntity(String.class);
-        m_logger.debug("Response: \n" + responseXML);
+//        // m_logger.debug("Response: \n" + responseXML);
         TsResponse response = unmarshalResponse(responseXML);
 
         if (response.getError() != null) {
@@ -295,7 +295,7 @@ public class RestApiUtils {
     public WorkbookType invokePublishWorkbook(TableauCredentialsType credential, String siteId, String projectId,
                                               String workbookName, File workbookFile, boolean chunkedPublish) {
 
-        m_logger.info(String.format("Publishing workbook '%s' on site '%s'.", workbookName, siteId));
+//        // m_logger.info(String.format("Publishing workbook '%s' on site '%s'.", workbookName, siteId));
 
         if (chunkedPublish) {
             return invokePublishWorkbookChunked(credential, siteId, projectId, workbookName, workbookFile);
@@ -315,7 +315,7 @@ public class RestApiUtils {
      */
     public ProjectListType invokeQueryProjects(TableauCredentialsType credential, String siteId) {
 
-        m_logger.info(String.format("Querying projects on site '%s'.", siteId));
+//        // m_logger.info(String.format("Querying projects on site '%s'.", siteId));
 
         String url = Operation.QUERY_PROJECTS.getUrl(siteId);
 
@@ -324,7 +324,7 @@ public class RestApiUtils {
 
         // Verifies that the response has a projects element
         if (response.getProjects() != null) {
-            m_logger.info("Query projects is successful!");
+//            // m_logger.info("Query projects is successful!");
 
             return response.getProjects();
         }
@@ -336,7 +336,7 @@ public class RestApiUtils {
     @SuppressWarnings("unchecked")
     public Map<String, Object> invokeQueryDatasources(TableauCredentialsType credential, String siteId) {
 
-        m_logger.info(String.format("Querying datasources on site '%s'.", siteId));
+//        // m_logger.info(String.format("Querying datasources on site '%s'.", siteId));
         System.out.println(String.format("Querying datasources on site '%s'.", siteId));
 
         String url = Operation.QUERY_DATASOURCES.getUrl(siteId);
@@ -353,7 +353,7 @@ public class RestApiUtils {
         String responseJson = clientResponse.getEntity(String.class);
 
         if (clientResponse.getStatus() == 200) {
-            m_logger.info("Query datasources are successful!");
+//            // m_logger.info("Query datasources are successful!");
             System.out.println("Query datasources are successful!");
             Type type = new TypeToken<Map<String, Object>>(){}.getType();
             return (Map<String, Object>) ((Map<String, Object>) new Gson().fromJson(responseJson, type)).get("datasources");
@@ -366,7 +366,7 @@ public class RestApiUtils {
     @SuppressWarnings("unchecked")
     public Map<String, Object> invokeQueryDatasourceConnections(TableauCredentialsType credential, String siteId, String datasourceId) {
 
-        m_logger.info(String.format("Querying datasource connections on site '%s'.", siteId));
+//        // m_logger.info(String.format("Querying datasource connections on site '%s'.", siteId));
         System.out.println(String.format("Querying datasource connections on site '%s'.", siteId));
 
         String url = Operation.QUERY_DATASOURCE_CONNECTIONS.getUrl(siteId, datasourceId);
@@ -383,7 +383,7 @@ public class RestApiUtils {
 
         // Verifies that the response has a projects element
         if (clientResponse.getStatus() == 200) {
-            m_logger.info("Query datasource connections are successful!");
+//            // m_logger.info("Query datasource connections are successful!");
             System.out.println("Query datasource connections are successful!");
             Type type = new TypeToken<Map<String, Object>>(){}.getType();
             return (Map<String, Object>) ((Map<String, Object>) new Gson().fromJson(responseJson, type)).get("connections");
@@ -397,7 +397,7 @@ public class RestApiUtils {
     @SuppressWarnings("unchecked")
     public Map<String, Object> invokeUpdateDatasourceConnection(TableauCredentialsType credential, String siteId, String datasourceId, String connectionId, String password) {
 
-        m_logger.info(String.format("Updating datasource connection on site '%s'.", siteId));
+//        // m_logger.info(String.format("Updating datasource connection on site '%s'.", siteId));
         System.out.println(String.format("Updating datasource connection on site '%s'.", siteId));
 
         String url = Operation.UPDATE_DATASOURCE_CONNECTION.getUrl(siteId, datasourceId, connectionId);
@@ -419,7 +419,7 @@ public class RestApiUtils {
 
         // Verifies that the response has a projects element
         if (clientResponse.getStatus() == 200) {
-            m_logger.info("Update datasource connection is successful!");
+//            // m_logger.info("Update datasource connection is successful!");
             System.out.println("Update datasource connection is successful!");
             Type type = new TypeToken<Map<String, Object>>(){}.getType();
             return (Map<String, Object>) ((Map<String, Object>) new Gson().fromJson(responseJson, type)).get("connection");
@@ -439,8 +439,7 @@ public class RestApiUtils {
      */
     public SiteListType invokeQuerySites(TableauCredentialsType credential) {
 
-        m_logger.info("Querying sites on Server.");
-
+//        // m_logger.info("Querying sites on Server.");
         String url = Operation.QUERY_SITES.getUrl();
 
         // Makes a GET request with the authenticity token
@@ -448,7 +447,7 @@ public class RestApiUtils {
 
         // Verifies that the response has a sites element
         if (response.getSites() != null) {
-            m_logger.info("Query sites is successful!");
+//            // m_logger.info("Query sites is successful!");
 
             return response.getSites();
         }
@@ -472,7 +471,7 @@ public class RestApiUtils {
      */
     public WorkbookListType invokeQueryWorkbooks(TableauCredentialsType credential, String siteId, String userId) {
 
-        m_logger.info(String.format("Querying workbooks on site '%s'.", siteId));
+        // m_logger.info(String.format("Querying workbooks on site '%s'.", siteId));
 
         String url = Operation.QUERY_WORKBOOKS.getUrl(siteId, userId);
 
@@ -481,7 +480,7 @@ public class RestApiUtils {
 
         // Verifies that the response has a workbooks element
         if (response.getWorkbooks() != null) {
-            m_logger.info("Query workbooks is successful!");
+            // m_logger.info("Query workbooks is successful!");
 
             return response.getWorkbooks();
         }
@@ -498,7 +497,7 @@ public class RestApiUtils {
      */
     public TableauCredentialsType invokeSignIn(String username, String password, String contentUrl) {
 
-        m_logger.info("Signing in to Tableau Server");
+        // m_logger.info("Signing in to Tableau Server");
         System.out.println("Signing in to Tableau Server");
 
         String url = Operation.SIGN_IN.getUrl();
@@ -511,7 +510,7 @@ public class RestApiUtils {
 
         // Verifies that the response has a credentials element
         if (response.getCredentials() != null) {
-            m_logger.info("Sign in is successful!");
+            // m_logger.info("Sign in is successful!");
             System.out.println("Sign in is successful!");
             return response.getCredentials();
         }
@@ -531,7 +530,7 @@ public class RestApiUtils {
      */
     public void invokeSignOut(TableauCredentialsType credential) {
 
-        m_logger.info("Signing out of Tableau Server");
+        // m_logger.info("Signing out of Tableau Server");
 
         String url = Operation.SIGN_OUT.getUrl();
 
@@ -547,9 +546,9 @@ public class RestApiUtils {
         }
 
         if (clientResponse != null && clientResponse.getStatus() == Status.NO_CONTENT.getStatusCode()) {
-            m_logger.info("Successfully signed out of Tableau Server");
+            // m_logger.info("Successfully signed out of Tableau Server");
         } else {
-            m_logger.error("Failed to sign out of Tableau Server");
+            // m_logger.error("Failed to sign out of Tableau Server");
         }
     }
 
@@ -696,7 +695,7 @@ public class RestApiUtils {
         // Parses the response from the server into an XML string
         String responseXML = clientResponse.getEntity(String.class);
 
-        m_logger.info("Response: \n" + responseXML);
+        // m_logger.info("Response: \n" + responseXML);
 
         // Returns the unmarshalled XML response
         return unmarshalResponse(responseXML);
@@ -720,7 +719,7 @@ public class RestApiUtils {
     private void invokeAppendFileUpload(TableauCredentialsType credential, String siteId, String uploadSessionId,
                                         byte[] chunk, int numChunkBytes) {
 
-        m_logger.info(String.format("Appending to file upload '%s'.", uploadSessionId));
+        // m_logger.info(String.format("Appending to file upload '%s'.", uploadSessionId));
 
         String url = Operation.APPEND_FILE_UPLOAD.getUrl(siteId, uploadSessionId);
 
@@ -751,7 +750,7 @@ public class RestApiUtils {
      */
     private FileUploadType invokeInitiateFileUpload(TableauCredentialsType credential, String siteId) {
 
-        m_logger.info(String.format("Initia projects on site '%s'.", siteId));
+        // m_logger.info(String.format("Initia projects on site '%s'.", siteId));
 
         String url = Operation.INITIATE_FILE_UPLOAD.getUrl(siteId);
 
@@ -760,7 +759,7 @@ public class RestApiUtils {
 
         // Verifies that the response has a file upload element
         if (response.getFileUpload() != null) {
-            m_logger.info("Initiate file upload is successful!");
+            // m_logger.info("Initiate file upload is successful!");
 
             return response.getFileUpload();
         }
@@ -818,7 +817,7 @@ public class RestApiUtils {
 
         // Verifies that the response has a workbook element
         if (response.getWorkbook() != null) {
-            m_logger.info("Publish workbook is successful!");
+            // m_logger.info("Publish workbook is successful!");
 
             return response.getWorkbook();
         }
@@ -857,7 +856,7 @@ public class RestApiUtils {
 
         // Verifies that the response has a workbook element
         if (response.getWorkbook() != null) {
-            m_logger.info("Publish workbook is successful!");
+            // m_logger.info("Publish workbook is successful!");
 
             return response.getWorkbook();
         }
@@ -888,7 +887,7 @@ public class RestApiUtils {
         // Parses the response from the server into an XML string
         String responseXML = clientResponse.getEntity(String.class);
 
-        m_logger.debug("Response: \n" + responseXML);
+        // m_logger.debug("Response: \n" + responseXML);
 
         // Returns the unmarshalled XML response
         return unmarshalResponse(responseXML);
@@ -914,14 +913,14 @@ public class RestApiUtils {
             try {
                 s_jaxbMarshaller.marshal(requestPayload, writer);
             } catch (JAXBException ex) {
-                m_logger.error("There was a problem marshalling the payload");
+                // m_logger.error("There was a problem marshalling the payload");
             }
         }
 
         // Converts the XML into a string
         String payload = writer.toString();
 
-        m_logger.debug("Input payload: \n" + payload);
+        // m_logger.debug("Input payload: \n" + payload);
 
         // Creates the HTTP client object and makes the HTTP request to the
         // specified URL
@@ -935,7 +934,7 @@ public class RestApiUtils {
         // Parses the response from the server into an XML string
         String responseXML = clientResponse.getEntity(String.class);
 
-        m_logger.debug("Response: \n" + responseXML);
+        // m_logger.debug("Response: \n" + responseXML);
 
         // Returns the unmarshalled XML response
         return unmarshalResponse(responseXML);
@@ -961,14 +960,14 @@ public class RestApiUtils {
             try {
                 s_jaxbMarshaller.marshal(requestPayload, writer);
             } catch (JAXBException ex) {
-                m_logger.error("There was a problem marshalling the payload");
+                // m_logger.error("There was a problem marshalling the payload");
             }
         }
 
         // Converts the XML into a string
         String payload = writer.toString();
 
-        m_logger.debug("Input payload: \n" + payload);
+        // m_logger.debug("Input payload: \n" + payload);
 
         // Creates the XML request payload portion of the multipart request
         BodyPart payloadPart = new FormDataBodyPart(TABLEAU_PAYLOAD_NAME, payload);
@@ -995,7 +994,7 @@ public class RestApiUtils {
         // Parses the response from the server into an XML string
         String responseXML = clientResponse.getEntity(String.class);
 
-        m_logger.debug("Response: \n" + responseXML);
+        // m_logger.debug("Response: \n" + responseXML);
 
         // Returns the unmarshalled XML response
         return unmarshalResponse(responseXML);
@@ -1021,14 +1020,14 @@ public class RestApiUtils {
             try {
                 s_jaxbMarshaller.marshal(requestPayload, writer);
             } catch (JAXBException ex) {
-                m_logger.error("There was a problem marshalling the payload");
+                // m_logger.error("There was a problem marshalling the payload");
             }
         }
 
         // Converts the XML into a string
         String payload = writer.toString();
 
-        m_logger.debug("Input payload: \n" + payload);
+        // m_logger.debug("Input payload: \n" + payload);
 
         // Creates the HTTP client object and makes the HTTP request to the
         // specified URL
@@ -1042,7 +1041,7 @@ public class RestApiUtils {
         // Parses the response from the server into an XML string
         String responseXML = clientResponse.getEntity(String.class);
 
-        m_logger.debug("Response: \n" + responseXML);
+        // m_logger.debug("Response: \n" + responseXML);
 
         // Returns the unmarshalled XML response
         return unmarshalResponse(responseXML);
@@ -1069,14 +1068,14 @@ public class RestApiUtils {
             try {
                 s_jaxbMarshaller.marshal(requestPayload, writer);
             } catch (JAXBException ex) {
-                m_logger.error("There was a problem marshalling the payload");
+                // m_logger.error("There was a problem marshalling the payload");
             }
         }
 
         // Converts the XML into a string
         String payload = writer.toString();
 
-        m_logger.debug("Input payload: \n" + payload);
+        // m_logger.debug("Input payload: \n" + payload);
 
         // Creates the XML request payload portion of the multipart request
         BodyPart payloadPart = new FormDataBodyPart(TABLEAU_PAYLOAD_NAME, payload);
@@ -1103,7 +1102,7 @@ public class RestApiUtils {
         // Parses the response from the server into an XML string
         String responseXML = clientResponse.getEntity(String.class);
 
-        m_logger.debug("Response: \n" + responseXML);
+        // m_logger.debug("Response: \n" + responseXML);
 
         // Returns the unmarshalled XML response
         return unmarshalResponse(responseXML);
@@ -1125,7 +1124,7 @@ public class RestApiUtils {
             StringReader reader = new StringReader(responseXML);
             tsResponse = s_jaxbUnmarshaller.unmarshal(new StreamSource(reader), TsResponse.class).getValue();
         } catch (JAXBException e) {
-            m_logger.error("Failed to parse response from server due to:");
+            // m_logger.error("Failed to parse response from server due to:");
             e.printStackTrace();
         }
 
