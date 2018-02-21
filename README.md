@@ -4,7 +4,7 @@
 
 * <code>-u</code> tableau username
 
-* <code>-s</code> tableau password
+* <code>-p</code> tableau password
 
 * <code>-ndp</code> tableau new datasource connection password
 
