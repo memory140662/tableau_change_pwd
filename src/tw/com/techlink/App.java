@@ -16,11 +16,12 @@ public class App {
         CONFIG_KEY_NAME.put("-u", "username");
         CONFIG_KEY_NAME.put("-ndp", "newDbPassword");
         CONFIG_KEY_NAME.put("-t", "type");
+        CONFIG_KEY_NAME.put("-cu", "contentUrl");
     }
 
     @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        System.out.println("version: 2018/02/09");
+        System.out.println("version: 2018/02/21");
         int res = 0;
 
         RestApiUtils utils = null;
@@ -33,10 +34,12 @@ public class App {
             String password = config.get("password");
             String dbNewPassword = config.get("newDbPassword");
             String type = config.get("type");
+            String contentUrl = (config.get("contentUrl") == null)? "": config.get("contentUrl");
 
             if (username == null || password == null || server == null) throw new Exception("Username, Password or Server is null.");
             utils = RestApiUtils.getInstance(server);
-            credential = utils.invokeSignIn(username, password, (server.contains("localhost")) ? "" : server);
+            credential = utils.invokeSignIn(username, password, contentUrl);
+            if (credential == null) throw new Exception("Login failed.");
             Map<String, Object> datasources = utils.invokeQueryDatasources(credential, credential.getSite().getId());
             Object tmp;
             for (String datasourceKey: datasources.keySet()) {
