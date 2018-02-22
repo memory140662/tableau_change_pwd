@@ -395,8 +395,8 @@ public class RestApiUtils {
         return null;
     }
 
-    public TableauCredentialsType invokeSwitchSite(TableauCredentialsType credential, String contentUrl) {
-        System.out.println("Switch Site to ".concat(credential.getSite().getId()));
+    public TableauCredentialsType invokeSwitchSite(TableauCredentialsType credential, String siteId, String contentUrl) {
+        System.out.println("Switch Site to ".concat(siteId));
 
         String url = Operation.SWITCH_SITE.getUrl();
 
@@ -405,11 +405,11 @@ public class RestApiUtils {
         Map<String, Object> data = new HashMap<>();
         data.put("contentUrl", contentUrl);
 
-        // Sets the header and makes a GET request
+        // Sets the header and makes a POST request
         ClientResponse clientResponse = webResource.header(TABLEAU_AUTH_HEADER, credential.getToken())
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .type(MediaType.APPLICATION_JSON_TYPE)
-                .put(ClientResponse.class, new Gson().toJson(data));
+                .post(ClientResponse.class, new Gson().toJson(data));
 
         String responseJson = clientResponse.getEntity(String.class);
 
