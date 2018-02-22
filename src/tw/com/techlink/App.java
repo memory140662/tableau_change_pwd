@@ -43,6 +43,7 @@ public class App {
             credential = utils.invokeSignIn(username, password, contentUrl);
             if (credential == null) throw new Exception("Login failed.");
             SiteListType siteListType = utils.invokeQuerySites(credential);
+            if (siteListType == null) throw new Exception("Site not found.");
             for(SiteType siteType: siteListType.getSite()) {
                 Map<String, Object> datasources = utils.invokeQueryDatasources(credential, siteType.getId());
                 Object tmp;
