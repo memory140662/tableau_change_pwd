@@ -400,16 +400,22 @@ public class RestApiUtils {
 
         String url = Operation.SWITCH_SITE.getUrl();
 
+        Client client = Client.create();
+        WebResource webResource = client.resource(url);
+        Map<String, Object> data = new HashMap<>();
+        data.put("contentUrl", contentUrl);
 
-        TsRequest payload = m_objectFactory.createTsRequest();
-        SiteType site = m_objectFactory.createSiteType();
-        site.setContentUrl(contentUrl);
-        payload.setSiteType(site);
-        TsResponse response = post(url, credential.getToken(), payload);
+        // Sets the header and makes a GET request
+        ClientResponse clientResponse = webResource.header(TABLEAU_AUTH_HEADER, credential.getToken())
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .type(MediaType.APPLICATION_JSON_TYPE)
+                .put(ClientResponse.class, new Gson().toJson(data));
 
-        if (response.getCredentials() != null) {
+        String responseJson = clientResponse.getEntity(String.class);
+
+        if (clientResponse.getStatus() == 200) {
             System.out.println("Switch site is success");
-            return response.getCredentials();
+            return new Gson().fromJson(responseJson, TsResponse.class).getCredentials();
         }
         return null;
     }

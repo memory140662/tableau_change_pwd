@@ -46,7 +46,7 @@ public class App {
             SiteListType siteListType = utils.invokeQuerySites(credential);
             if (isAnyNull(siteListType)) throw new Exception("Site not found.");
             for(SiteType siteType: siteListType.getSite()) {
-                if (isAnyNull(siteType)) continue;
+                if (isAnyNull(siteType, siteCredential)) continue;
                 siteCredential = utils.invokeSwitchSite(siteCredential, siteType.getContentUrl());
                 if (isAnyNull(siteCredential)) {
                     System.out.println("Switch site to ".concat(siteType.getId()).concat(" failed."));
