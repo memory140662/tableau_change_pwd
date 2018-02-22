@@ -402,12 +402,9 @@ public class RestApiUtils {
 
 
         TsRequest payload = m_objectFactory.createTsRequest();
-        TableauCredentialsType switchCredentials = m_objectFactory.createTableauCredentialsType();
         SiteType site = m_objectFactory.createSiteType();
         site.setContentUrl(contentUrl);
-        switchCredentials.setSite(site);
-        payload.setCredentials(switchCredentials);
-
+        payload.setSiteType(site);
         TsResponse response = post(url, credential.getToken(), payload);
 
         if (response.getCredentials() != null) {

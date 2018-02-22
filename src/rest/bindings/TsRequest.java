@@ -53,6 +53,7 @@ public class TsRequest {
     protected GroupType group;
     protected PermissionsType permissions;
     protected WorkbookType workbook;
+    protected SiteType siteType;
 
     /**
      * Gets the value of the credentials property.
@@ -138,4 +139,11 @@ public class TsRequest {
         this.workbook = value;
     }
 
+    public SiteType getSiteType() {
+        return siteType;
+    }
+
+    public void setSiteType(SiteType siteType) {
+        this.siteType = siteType;
+    }
 }
