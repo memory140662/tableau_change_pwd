@@ -48,6 +48,10 @@ public class App {
             for(SiteType siteType: siteListType.getSite()) {
                 if (isAnyNull(siteType)) continue;
                 siteCredential = utils.invokeSwitchSite(siteCredential, siteType.getContentUrl());
+                if (isAnyNull(siteCredential)) {
+                    System.out.println("Switch site to ".concat(siteType.getId()).concat(" failed."));
+                    continue;
+                }
                 Map<String, Object> datasources = utils.invokeQueryDatasources(siteCredential, siteType.getId());
                 Object tmp;
                 if (isAnyNull(datasources)) continue;
