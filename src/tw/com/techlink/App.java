@@ -47,10 +47,12 @@ public class App {
             if (isAnyNull(siteListType)) throw new Exception("Site not found.");
             for(SiteType siteType: siteListType.getSite()) {
                 if (isAnyNull(siteType, siteCredential)) continue;
-                siteCredential = utils.invokeSwitchSite(siteCredential, siteType.getContentUrl());
-                if (isAnyNull(siteCredential)) {
-                    System.out.println("Switch site to ".concat(siteType.getId()).concat(" failed."));
-                    continue;
+                if (!siteType.getId().equals(siteCredential.getSite().getId())) {
+                    siteCredential = utils.invokeSwitchSite(siteCredential, siteType.getContentUrl());
+                    if (isAnyNull(siteCredential)) {
+                        System.out.println("Switch site to ".concat(siteType.getId()).concat(" failed."));
+                        continue;
+                    }
                 }
                 Map<String, Object> datasources = utils.invokeQueryDatasources(siteCredential, siteType.getId());
                 Object tmp;
