@@ -37,16 +37,18 @@ public class App {
             String dbNewPassword = config.get("newDbPassword");
             String type = config.get("type");
             String contentUrl = (config.get("contentUrl") == null)? "": config.get("contentUrl");
-
+            TableauCredentialsType siteCredential;
             if (isAnyNull(username, password, server)) throw new Exception("Username, Password or Server is null.");
             utils = RestApiUtils.getInstance(server);
             credential = utils.invokeSignIn(username, password, contentUrl);
             if (isAnyNull(credential)) throw new Exception("Login failed.");
+            siteCredential = credential;
             SiteListType siteListType = utils.invokeQuerySites(credential);
             if (isAnyNull(siteListType)) throw new Exception("Site not found.");
             for(SiteType siteType: siteListType.getSite()) {
                 if (isAnyNull(siteType)) continue;
-                Map<String, Object> datasources = utils.invokeQueryDatasources(credential, siteType.getId());
+                siteCredential = utils.invokeSwitchSite(siteCredential, siteType.getContentUrl());
+                Map<String, Object> datasources = utils.invokeQueryDatasources(siteCredential, siteType.getId());
                 Object tmp;
                 if (isAnyNull(datasources)) continue;
                 for (String datasourceKey : datasources.keySet()) {
@@ -55,7 +57,7 @@ public class App {
                     for (Map<String, Object> data : datasource) {
                         if (isTypeNotEqual(type, data)) continue;
                         System.out.println(String.format("Datasource Name: %s, Type: %s", data.get("name"), data.get("type")));
-                        Map<String, Object> connections = utils.invokeQueryDatasourceConnections(credential, siteType.getId(), (String) data.get("id"));
+                        Map<String, Object> connections = utils.invokeQueryDatasourceConnections(siteCredential, siteType.getId(), (String) data.get("id"));
                         if (isAnyNull(connections)) continue;
                         for (String connectionKey : connections.keySet()) {
                             List<Map<String, Object>> connection = (List<Map<String, Object>>) connections.get(connectionKey);
@@ -65,7 +67,7 @@ public class App {
                                 System.out.println(String.format("\tConnection User Name: %s", conn.get("userName")));
                                 if (!isAnyNull(dbNewPassword) && !dbNewPassword.trim().isEmpty()) {
                                     tmp = utils.invokeUpdateDatasourceConnection(
-                                            credential,
+                                            siteCredential,
                                             siteType.getId(),
                                             (String) data.get("id"),
                                             (String) conn.get("id"),
