@@ -403,8 +403,9 @@ public class RestApiUtils {
         Client client = Client.create();
         WebResource webResource = client.resource(url);
         Map<String, Object> data = new HashMap<>();
-        data.put("contentUrl", contentUrl);
-
+        Map<String, Object> site = new HashMap<>();
+        site.put("contentUrl", contentUrl);
+        data.put("site", site);
         // Sets the header and makes a POST request
         ClientResponse clientResponse = webResource.header(TABLEAU_AUTH_HEADER, credential.getToken())
                 .accept(MediaType.APPLICATION_JSON_TYPE)
