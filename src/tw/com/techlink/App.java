@@ -45,6 +45,7 @@ public class App {
             SiteListType siteListType = utils.invokeQuerySites(credential);
             if (siteListType == null) throw new Exception("Site not found.");
             for(SiteType siteType: siteListType.getSite()) {
+                if (siteType == null) continue;
                 Map<String, Object> datasources = utils.invokeQueryDatasources(credential, siteType.getId());
                 Object tmp;
                 for (String datasourceKey : datasources.keySet()) {
