@@ -38,27 +38,32 @@ public class App {
             String type = config.get("type");
             String contentUrl = (config.get("contentUrl") == null)? "": config.get("contentUrl");
 
-            if (username == null || password == null || server == null) throw new Exception("Username, Password or Server is null.");
+            if (isAnyNull(username, password, server)) throw new Exception("Username, Password or Server is null.");
             utils = RestApiUtils.getInstance(server);
             credential = utils.invokeSignIn(username, password, contentUrl);
-            if (credential == null) throw new Exception("Login failed.");
+            if (isAnyNull(credential)) throw new Exception("Login failed.");
             SiteListType siteListType = utils.invokeQuerySites(credential);
-            if (siteListType == null) throw new Exception("Site not found.");
+            if (isAnyNull(siteListType)) throw new Exception("Site not found.");
             for(SiteType siteType: siteListType.getSite()) {
-                if (siteType == null) continue;
+                if (isAnyNull(siteType)) continue;
                 Map<String, Object> datasources = utils.invokeQueryDatasources(credential, siteType.getId());
                 Object tmp;
+                if (isAnyNull(datasources)) continue;
                 for (String datasourceKey : datasources.keySet()) {
                     List<Map<String, Object>> datasource = (List<Map<String, Object>>) datasources.get(datasourceKey);
+                    if (isAnyNull(datasource)) continue;
                     for (Map<String, Object> data : datasource) {
                         if (isTypeNotEqual(type, data)) continue;
                         System.out.println(String.format("Datasource Name: %s, Type: %s", data.get("name"), data.get("type")));
                         Map<String, Object> connections = utils.invokeQueryDatasourceConnections(credential, siteType.getId(), (String) data.get("id"));
+                        if (isAnyNull(connections)) continue;
                         for (String connectionKey : connections.keySet()) {
                             List<Map<String, Object>> connection = (List<Map<String, Object>>) connections.get(connectionKey);
+                            if (isAnyNull(connection)) continue;
                             for (Map<String, Object> conn : connection) {
+                                if (isAnyNull(conn)) continue;
                                 System.out.println(String.format("\tConnection User Name: %s", conn.get("userName")));
-                                if (dbNewPassword != null && !dbNewPassword.trim().isEmpty()) {
+                                if (!isAnyNull(dbNewPassword) && !dbNewPassword.trim().isEmpty()) {
                                     tmp = utils.invokeUpdateDatasourceConnection(
                                             credential,
                                             siteType.getId(),
@@ -66,7 +71,7 @@ public class App {
                                             (String) conn.get("id"),
                                             dbNewPassword
                                     );
-                                    if (tmp == null) {
+                                    if (isAnyNull(tmp)) {
                                         System.out.println("Update datasource connection failed.");
                                     }
                                 }
@@ -87,7 +92,7 @@ public class App {
     }
 
     private static boolean isTypeNotEqual(String type, Map<String, Object> data) {
-        return type != null && !type.trim().isEmpty() && !type.equalsIgnoreCase((String) data.get("type"));
+        return !isAnyNull(type) && !type.trim().isEmpty() && !type.equalsIgnoreCase((String) data.get("type"));
     }
 
     private Map<String, String> getConfig(String ...args) {
@@ -105,5 +110,16 @@ public class App {
             }
         }
         return config;
+    }
+
+    private static boolean isAnyNull(Object... objs) {
+        boolean isNull = false;
+        for (Object obj: objs) {
+            if (obj == null) {
+                isNull = true;
+                break;
+            }
+        }
+        return isNull;
     }
 }
