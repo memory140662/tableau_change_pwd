@@ -45,7 +45,7 @@ import javax.xml.bind.annotation.XmlType;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = { "credentials", "group", "permissions", "workbook" })
+@XmlType(name = "", propOrder = { "credentials", "group", "permissions", "workbook", "siteType" })
 @XmlRootElement(name = "tsRequest")
 public class TsRequest {
 
