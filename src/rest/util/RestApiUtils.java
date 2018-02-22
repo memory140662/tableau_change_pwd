@@ -440,6 +440,7 @@ public class RestApiUtils {
     public SiteListType invokeQuerySites(TableauCredentialsType credential) {
 
 //        // m_logger.info("Querying sites on Server.");
+        System.out.println("Querying sites on Server.");
         String url = Operation.QUERY_SITES.getUrl();
 
         // Makes a GET request with the authenticity token
@@ -448,7 +449,7 @@ public class RestApiUtils {
         // Verifies that the response has a sites element
         if (response.getSites() != null) {
 //            // m_logger.info("Query sites is successful!");
-
+            System.out.println("Query sites is successful!");
             return response.getSites();
         }
 
