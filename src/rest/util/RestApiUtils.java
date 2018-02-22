@@ -418,6 +418,7 @@ public class RestApiUtils {
             System.out.println("Switch site is success");
             return new Gson().fromJson(responseJson, TsResponse.class).getCredentials();
         }
+        System.out.println("Switch Site " + clientResponse.getStatus());
         return null;
     }
 
