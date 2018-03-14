@@ -5,6 +5,7 @@ import rest.bindings.SiteType;
 import rest.bindings.TableauCredentialsType;
 import rest.util.RestApiUtils;
 
+import java.io.Console;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,27 +15,30 @@ public class App {
     private static final Map<String, String> CONFIG_KEY_NAME = new HashMap<>();
     static {
         CONFIG_KEY_NAME.put("-s", "server");
-        CONFIG_KEY_NAME.put("-p", "password");
         CONFIG_KEY_NAME.put("-u", "username");
-        CONFIG_KEY_NAME.put("-ndp", "newDbPassword");
         CONFIG_KEY_NAME.put("-t", "type");
         CONFIG_KEY_NAME.put("-cu", "contentUrl");
     }
 
     @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        System.out.println("version: 2018/02/22");
+        System.out.println("version: 2018/03/14");
         int res = 0;
 
         RestApiUtils utils = null;
         TableauCredentialsType credential = null;
+        Console console = System.console();
         try {
             Map<String, String> config = new App().getConfig(args);
 
+            if (console == null) {
+                throw new Exception("not console mode.");
+            }
+
+            char[] pwd = console.readPassword("Input Password For Login: ");
+            String password = new String(pwd);
             String server = config.get("server");
             String username = config.get("username");
-            String password = config.get("password");
-            String dbNewPassword = config.get("newDbPassword");
             String type = config.get("type");
             String contentUrl = (config.get("contentUrl") == null)? "": config.get("contentUrl");
             TableauCredentialsType siteCredential;
@@ -42,6 +46,14 @@ public class App {
             utils = RestApiUtils.getInstance(server);
             credential = utils.invokeSignIn(username, password, contentUrl);
             if (isAnyNull(credential)) throw new Exception("Login failed.");
+
+            pwd = console.readPassword("Input New DB Connection Password: ");
+            String dbNewPassword = new String(pwd);
+            pwd = console.readPassword("Confirm New DB Connection Password: ");
+            String confirmPassword = new String(pwd);
+            if (!dbNewPassword.equals(confirmPassword)) {
+                throw new Exception("Inconsistent Password.");
+            }
             siteCredential = credential;
             SiteListType siteListType = utils.invokeQuerySites(credential);
             if (isAnyNull(siteListType)) throw new Exception("Site not found.");

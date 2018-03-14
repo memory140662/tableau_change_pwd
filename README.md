@@ -4,10 +4,6 @@
 
 * <code>-u</code> tableau username
 
-* <code>-p</code> tableau password
-
-* <code>-ndp</code> tableau new datasource connection password
-
 * <code>-t</code> tableau datasource type
 
 * <code>-cu</code> tableau content url
