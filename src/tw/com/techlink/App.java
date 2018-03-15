@@ -1,11 +1,11 @@
 package tw.com.techlink;
 
+import jline.console.ConsoleReader;
 import rest.bindings.SiteListType;
 import rest.bindings.SiteType;
 import rest.bindings.TableauCredentialsType;
 import rest.util.RestApiUtils;
 
-import java.io.Console;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,21 +22,16 @@ public class App {
 
     @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        System.out.println("version: 2018/03/14");
+        System.out.println("version: 2018/03/15");
         int res = 0;
 
         RestApiUtils utils = null;
         TableauCredentialsType credential = null;
-        Console console = System.console();
+        char mask = '*';
         try {
             Map<String, String> config = new App().getConfig(args);
-
-            if (console == null) {
-                throw new Exception("not console mode.");
-            }
-
-            char[] pwd = console.readPassword("Input Password For Login: ");
-            String password = new String(pwd);
+            ConsoleReader console = new ConsoleReader();
+            String password = console.readLine("Input Password For Login: ", mask);
             String server = config.get("server");
             String username = config.get("username");
             String type = config.get("type");
@@ -47,10 +42,8 @@ public class App {
             credential = utils.invokeSignIn(username, password, contentUrl);
             if (isAnyNull(credential)) throw new Exception("Login failed.");
 
-            pwd = console.readPassword("Input New DB Connection Password: ");
-            String dbNewPassword = new String(pwd);
-            pwd = console.readPassword("Confirm New DB Connection Password: ");
-            String confirmPassword = new String(pwd);
+            String dbNewPassword = console.readLine("Input New DB Connection Password: ", mask);
+            String confirmPassword = console.readLine("Confirm New DB Connection Password: ", mask);
             if (!dbNewPassword.equals(confirmPassword)) {
                 throw new Exception("Inconsistent Password.");
             }
